@@ -1,9 +1,14 @@
 import { Environment, OrbitControls } from "@react-three/drei";
+import { useControls } from "leva";
 import { Perf } from "r3f-perf";
 
 function Experience() {
+  const { color } = useControls({
+    color: "#000",
+  });
   return (
     <>
+      <color attach="background" args={[color]} />
       <Perf position="top-left" />
       <OrbitControls />
       <Environment
