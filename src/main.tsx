@@ -3,18 +3,12 @@ import "./index.css";
 import Experience from "./Experience.tsx";
 import { Canvas } from "@react-three/fiber";
 import { Leva } from "leva";
+import { OrthographicCamera } from "@react-three/drei";
 
 createRoot(document.getElementById("root")!).render(
   <>
-    <Canvas
-      gl={{ antialias: true }}
-      shadows
-      camera={{
-        fov: 45,
-        near: 0.1,
-        far: 200,
-      }}
-    >
+    <Canvas gl={{ alpha: false, antialias: true }} className="">
+      <OrthographicCamera makeDefault position={[0, 0, 5]} />
       <Experience />
     </Canvas>
     <Leva collapsed />
