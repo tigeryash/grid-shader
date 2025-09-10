@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
-    "@react-three/drei": "^10.7.4",
+    "@react-three/drei": "^10.7.5",
     "@react-three/fiber": "^9.3.0",
     "@react-three/postprocessing": "^3.0.4",
     "@tailwindcss/vite": "^4.1.13",
@@ -25,6 +25,7 @@
     "tailwindcss": "^4.1.13",
     "three": "^0.180.0",
     "three-custom-shader-material": "^6.3.7",
+    "three-stdlib": "^2.36.0",
     "vite-plugin-glsl": "^1.5.1"
   },
   "devDependencies": {

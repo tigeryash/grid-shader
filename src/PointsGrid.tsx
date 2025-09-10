@@ -10,13 +10,13 @@ const PointsGrid = () => {
   const { size, viewport, pointer } = useThree();
 
   // Build a grid of points in world space
-  const { positions, sizes, count } = useMemo(() => {
-    const cols = 120;
-    const rows = 80;
+  const { positions, sizes } = useMemo(() => {
+    const cols = viewport.width * 0.08;
+    const rows = viewport.height * 0.08;
     const pts: number[] = [];
     const s: number[] = [];
     const w = viewport.width;
-    const h = viewport.height;
+    const h = viewport.height - 20;
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const px = (x / (cols - 1) - 0.5) * w;
@@ -28,17 +28,26 @@ const PointsGrid = () => {
     return {
       positions: new Float32Array(pts),
       sizes: new Float32Array(s),
-      count: cols * rows,
     };
   }, [viewport.width, viewport.height]);
 
+  const uniforms = useMemo(
+    () => ({
+      uMouse: { value: new THREE.Vector2(-1, -1) },
+      uResolution: { value: new THREE.Vector2(1, 1) },
+      uRadius: { value: 200 }, // Radius in pixels
+      uStrength: { value: 0.15 }, // How strong the push effect is
+      uTime: { value: 0 },
+    }),
+    []
+  );
+
   useFrame(({ clock }) => {
     if (!mat.current) return;
-    const x = (pointer.x + 1) * 0.5 * size.width;
-    const y = (-pointer.y + 1) * 0.5 * size.height;
-    mat.current.uMousex = x;
-    mat.current.uMousey = y;
-    mat.current.uResolution = (size.width, size.height);
+    const x = pointer.x * size.width * 0.5 + size.width * 0.5;
+    const y = -pointer.y * size.height * 0.5 + size.height * 0.5;
+    mat.current.uMouse = [x, y];
+    mat.current.uResolution = [size.width, size.height];
     mat.current.uTime = clock.getElapsedTime();
   });
 
@@ -54,18 +63,13 @@ const PointsGrid = () => {
         baseMaterial={THREE.PointsMaterial}
         vertexShader={vert}
         fragmentShader={frag}
-        uniforms={{
-          uMouse: { value: new THREE.Vector2(-1, -1) },
-          uResolution: { value: new THREE.Vector2(1, 1) },
-          uRadius: { value: 180 },
-          uStrength: { value: 0.12 }, // tune for your world scale
-        }}
+        uniforms={uniforms}
         // Base material props
         transparent={true}
         depthWrite={false}
-        size={1}
+        size={1} // base size; multiplied by aSize attribute
         sizeAttenuation={false} // keep constant pixel size
-        color={"#000"} // base color; used as csm_DiffuseColor
+        color={"black"}
       />
     </points>
   );
