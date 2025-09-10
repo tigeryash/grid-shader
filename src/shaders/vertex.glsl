@@ -2,39 +2,35 @@ uniform vec2 uMouse;
 uniform vec2 uResolution;
 uniform float uRadius;
 uniform float uStrength;
-uniform float uDamping; // Let's use time for a little extra movement
+
+uniform float uRadiusInner;
+uniform float uRadiusOuter;
 
 // Attribute from your bufferGeometry
-attribute vec3 aStartPosition;
-attribute vec3 aVelocity;
+attribute float aSize;
 
 // A varying to pass the strength of the effect to the fragment shader
 varying float vIntensity;
 
 void main(){
-  vec3 pos = position;
+  vec3 csm_Position = position;
 
   // --- 1. Coordinate Conversion ---
-  vec4 screenPosition = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  vec4 screenPosition = projectionMatrix * modelViewMatrix * vec4(csm_Position, 1.0);
   vec2 screenCoords = (screenPosition.xy / screenPosition.w + 1.0) / 2.0 * uResolution;
 
   // --- 2. Repulsion Calculation ---
   float dist = distance(screenCoords, uMouse);
-  vIntensity = 0.0;
   
-  if (dist < uRadius) {
-    // Calculate strength with a smooth falloff
-    float strength = 1.0 - pow(dist / uRadius, 2.0);
-    vIntensity = strength;
+  float falloff = 1.0 - smoothstep(uRadiusInner, uRadiusOuter, dist);
 
-    // Direction from mouse to point
+  vIntensity = falloff;
+
+  if(falloff > .0){
     vec2 direction = normalize(screenCoords - uMouse);
 
-    // Displace the position
-    // We multiply by strength and our main uStrength uniform
-    pos.xy += direction * strength * uStrength;
+    csm_Position.xy += direction * uStrength * falloff;
   }
 
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-  gl_PointSize = 2.0;
+   csm_PointSize = aSize;
 }
