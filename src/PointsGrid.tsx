@@ -7,9 +7,9 @@ import frag from "./shaders/fragment.glsl";
 import { useControls } from "leva";
 
 const DENSITY = 0.1;
-const STRENGTH = 85;
+const STRENGTH = 84;
 const RADIUS_INNER = 0;
-const RADIUS_OUTER = 250;
+const RADIUS_OUTER = 230;
 
 const PointsGrid = () => {
   const mat = useRef<any>(null);
