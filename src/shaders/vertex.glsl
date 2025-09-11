@@ -1,6 +1,5 @@
 uniform vec2 uMouse;
 uniform vec2 uResolution;
-uniform float uRadius;
 uniform float uStrength;
 
 uniform float uRadiusInner;
@@ -13,24 +12,21 @@ attribute float aSize;
 varying float vIntensity;
 
 void main(){
-  vec3 csm_Position = position;
+// start from the model position
+  vec3 p = position;
 
-  // --- 1. Coordinate Conversion ---
-  vec4 screenPosition = projectionMatrix * modelViewMatrix * vec4(csm_Position, 1.0);
-  vec2 screenCoords = (screenPosition.xy / screenPosition.w + 1.0) / 2.0 * uResolution;
-
-  // --- 2. Repulsion Calculation ---
-  float dist = distance(screenCoords, uMouse);
-  
+  // distance/falloff in world units
+  float dist = distance(p.xy, uMouse);
   float falloff = 1.0 - smoothstep(uRadiusInner, uRadiusOuter, dist);
-
   vIntensity = falloff;
 
-  if(falloff > .0){
-    vec2 direction = normalize(screenCoords - uMouse);
-
-    csm_Position.xy += direction * uStrength * falloff;
+  if (falloff > 0.0) {
+    // guard against zero-length normalize
+    vec2 dir = dist > 0.0 ? normalize(p.xy - uMouse) : vec2(0.0);
+    p.xy += dir * (uStrength * falloff);
   }
 
-   csm_PointSize = aSize;
+  // hand back to CSM
+  csm_Position = p;
+  csm_PointSize = aSize;
 }
